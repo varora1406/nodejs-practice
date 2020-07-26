@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+<div class="jumbotron text-center">
+  <h1>Jarvis: web client with express </h1>
+</div>
+  
+<div class="container">
+  <div class="row">
+    <div class="col-10"> 
+        
+        <h3>Jarvis need your command</h3>
+        <input type="text" class="form-control" id = "name" name="name" placeholder="Who are you ?"/>
+
+        <input type="text" class="form-control" id = "command" name="command" placeholder="ask me anything"/>
+        <br>
+        <button class="btn btn-success" id="sendCommand">command</button>
+
+        <div id="result">
+
+        </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+<script>
+    var socket = io();
+    $(() => {     
+        $('#sendCommand').click(() => {
+            var command = {name: $("#name").val(), command:$("#command").val()}
+            postCommand(command);
+        });
+        getCommands();
+
+    })
+
+    socket.on('command', addCommand);
+
+    function addCommand(cmd){
+        $("#result").append(`<h4>${cmd.name}</h4> <p>Processing: ${cmd.command} </p>`);
+    }
+
+    function postCommand(cmd)
+    {
+        $.post("http://localhost:3000/commands", cmd, 
+            (data) => {
+              //addCommand(data);  
+            });
+    }
+
+    function getCommands(){
+        $.get("http://localhost:3000/commands", 
+            (data) => {
+              data.forEach(addCommand);  
+            });
+    }
+
+</script>
